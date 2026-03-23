@@ -20,7 +20,8 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { useTasks } from '../context/TaskContext';
-import { useTheme } from '../context/ThemeContext';
+import { useProfile } from '../context/ProfileContext';
+import { useTheme, CHART_COLORS } from '../context/ThemeContext';
 import ProgressBar from '../components/ProgressBar';
 import TaskModal from '../components/TaskModal';
 import TaskCard from '../components/TaskCard';
@@ -40,17 +41,17 @@ const item = {
 
 export default function Dashboard() {
   const { tasks, addTask, editTask, deleteTask, toggleComplete } = useTasks();
-  const { isDark } = useTheme();
+  const { profile, stats } = useProfile();
+  const { theme } = useTheme();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+  const colors = CHART_COLORS[theme] || CHART_COLORS.dark;
+
   // Stats
   const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(t => t.completed).length;
-  const pendingTasks = totalTasks - completedTasks;
+  const pendingTasks = totalTasks - stats.completedTasks;
   const todayTasks = tasks.filter(t => isToday(t.dueDate));
-  const todayCompleted = todayTasks.filter(t => t.completed).length;
-  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   // Weekly chart data
   const weeklyData = useMemo(() => {
@@ -87,14 +88,14 @@ export default function Dashboard() {
           pointStyle: 'circle',
           padding: 20,
           font: { size: 11, family: 'Inter' },
-          color: isDark ? '#adb5bd' : '#495057',
+          color: colors.textSecondary,
         },
       },
       tooltip: {
-        backgroundColor: isDark ? '#1a1d27' : '#fff',
-        titleColor: isDark ? '#fff' : '#212529',
-        bodyColor: isDark ? '#adb5bd' : '#495057',
-        borderColor: isDark ? '#2a2d3a' : '#e9ecef',
+        backgroundColor: colors.bgCard,
+        titleColor: colors.textPrimary,
+        bodyColor: colors.textSecondary,
+        borderColor: colors.borderColor,
         borderWidth: 1,
         cornerRadius: 12,
         padding: 12,
@@ -105,7 +106,7 @@ export default function Dashboard() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { font: { size: 11, family: 'Inter' }, color: isDark ? '#868e96' : '#adb5bd' },
+        ticks: { font: { size: 11, family: 'Inter' }, color: colors.textMuted },
         border: { display: false },
       },
       y: {
@@ -113,9 +114,9 @@ export default function Dashboard() {
         ticks: {
           stepSize: 1,
           font: { size: 11, family: 'Inter' },
-          color: isDark ? '#868e96' : '#adb5bd',
+          color: colors.textMuted,
         },
-        grid: { color: isDark ? '#2a2d3a' : '#f1f3f5' },
+        grid: { color: colors.borderColor },
         border: { display: false },
       },
     },
@@ -127,14 +128,14 @@ export default function Dashboard() {
       {
         label: 'Completed',
         data: weeklyData.completed,
-        backgroundColor: isDark ? 'rgba(92, 124, 250, 0.7)' : 'rgba(76, 110, 245, 0.8)',
+        backgroundColor: colors.accent,
         borderRadius: 6,
         barPercentage: 0.6,
       },
       {
         label: 'Created',
         data: weeklyData.created,
-        backgroundColor: isDark ? 'rgba(92, 124, 250, 0.2)' : 'rgba(76, 110, 245, 0.15)',
+        backgroundColor: colors.accentGlow,
         borderRadius: 6,
         barPercentage: 0.6,
       },
@@ -157,11 +158,11 @@ export default function Dashboard() {
     setModalOpen(true);
   };
 
-  const stats = [
-    { label: 'Total Tasks', value: totalTasks, icon: ListTodo, color: 'from-primary-500 to-primary-600' },
-    { label: 'Completed', value: completedTasks, icon: CheckCircle2, color: 'from-emerald-500 to-emerald-600' },
+  const statCards = [
+    { label: 'Total Tasks', value: totalTasks, icon: ListTodo, color: 'from-blue-500 to-blue-600' },
+    { label: 'Completed', value: stats.completedTasks, icon: CheckCircle2, color: 'from-emerald-500 to-emerald-600' },
     { label: 'Pending', value: pendingTasks, icon: Clock, color: 'from-amber-500 to-amber-600' },
-    { label: 'Completion Rate', value: `${completionRate}%`, icon: TrendingUp, color: 'from-violet-500 to-violet-600' },
+    { label: 'Completion Rate', value: `${stats.completionRate}%`, icon: TrendingUp, color: 'from-violet-500 to-violet-600' },
   ];
 
   return (
@@ -169,11 +170,11 @@ export default function Dashboard() {
       {/* Header */}
       <motion.div variants={item} className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
             Dashboard
           </h1>
-          <p className="text-sm text-surface-500 mt-1">
-            Welcome back! Here's your productivity overview.
+          <p className="text-sm text-[var(--text-muted)] mt-1">
+            Welcome back, {profile.name}! Here's your productivity overview.
           </p>
         </div>
         <button
@@ -181,27 +182,28 @@ export default function Dashboard() {
           className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Add Task
+          <span className="hidden sm:inline">Add Task</span>
+          <span className="sm:hidden">Add</span>
         </button>
       </motion.div>
 
       {/* Stats grid */}
       <motion.div variants={item} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {stats.map((stat, idx) => (
+        {statCards.map((stat, idx) => (
           <motion.div
             key={stat.label}
             variants={item}
-            className="glass-card p-4 sm:p-5 hover:shadow-card-hover transition-shadow"
+            className="glass-card p-4 sm:p-5"
           >
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
                 <stat.icon className="w-4 h-4 text-white" />
               </div>
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white">
+            <p className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
               {stat.value}
             </p>
-            <p className="text-xs font-medium text-surface-500 mt-1">{stat.label}</p>
+            <p className="text-xs font-medium text-[var(--text-muted)] mt-1">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -210,20 +212,20 @@ export default function Dashboard() {
       <motion.div variants={item} className="glass-card p-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Target className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-            <h2 className="text-sm font-bold text-surface-900 dark:text-white">Daily Progress</h2>
+            <Target className="w-4 h-4 text-[var(--accent)]" />
+            <h2 className="text-sm font-bold text-[var(--text-primary)]">Daily Progress</h2>
           </div>
-          <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
-            {todayCompleted}/{todayTasks.length} tasks
+          <span className="text-sm font-bold text-[var(--accent)]">
+            {stats.todayCompleted}/{todayTasks.length} tasks
           </span>
         </div>
-        <ProgressBar value={todayCompleted} max={todayTasks.length || 1} size="md" />
-        <p className="text-xs text-surface-500 mt-2">
+        <ProgressBar value={stats.todayCompleted} max={todayTasks.length || 1} size="md" />
+        <p className="text-xs text-[var(--text-muted)] mt-2">
           {todayTasks.length === 0
             ? 'No tasks scheduled for today'
-            : todayCompleted === todayTasks.length
+            : stats.todayCompleted === todayTasks.length
             ? '🎉 All daily tasks completed!'
-            : `${todayTasks.length - todayCompleted} tasks remaining for today`}
+            : `${todayTasks.length - stats.todayCompleted} tasks remaining for today`}
         </p>
       </motion.div>
 
@@ -232,8 +234,8 @@ export default function Dashboard() {
         {/* Weekly chart */}
         <motion.div variants={item} className="lg:col-span-3 glass-card p-5">
           <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-            <h2 className="text-sm font-bold text-surface-900 dark:text-white">Weekly Overview</h2>
+            <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
+            <h2 className="text-sm font-bold text-[var(--text-primary)]">Weekly Overview</h2>
           </div>
           <div className="h-[220px]">
             <Bar options={chartOptions} data={chartData} />
@@ -241,11 +243,11 @@ export default function Dashboard() {
         </motion.div>
 
         {/* Recent tasks */}
-        <motion.div variants={item} className="lg:col-span-2 glass-card p-5">
-          <h2 className="text-sm font-bold text-surface-900 dark:text-white mb-3">Recent Tasks</h2>
+        <motion.div variants={item} className="lg:col-span-2 glass-card p-4 sm:p-5">
+          <h2 className="text-sm font-bold text-[var(--text-primary)] mb-3">Recent Tasks</h2>
           <div className="space-y-2">
             {recentTasks.length === 0 ? (
-              <p className="text-sm text-surface-400 dark:text-surface-600 py-8 text-center">
+              <p className="text-sm text-[var(--text-muted)] py-8 text-center">
                 No pending tasks. Add one to get started!
               </p>
             ) : (

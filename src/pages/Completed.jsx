@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, RotateCcw, Trash2, Search, X } from 'lucide-react';
 import { useTasks } from '../context/TaskContext';
-import { formatDate, formatTime, PRIORITIES, getCategoryConfig } from '../utils';
+import { formatDate, PRIORITIES, getCategoryConfig } from '../utils';
 
 const container = {
   hidden: { opacity: 0 },
@@ -41,10 +41,10 @@ export default function Completed() {
             <CheckCircle2 className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
               Completed
             </h1>
-            <p className="text-sm text-surface-500">
+            <p className="text-sm text-[var(--text-muted)]">
               {completedTasks.length} tasks completed
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function Completed() {
       {/* Search */}
       <motion.div variants={item}>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
           <input
             type="text"
             value={searchQuery}
@@ -65,7 +65,7 @@ export default function Completed() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -76,9 +76,9 @@ export default function Completed() {
       {/* Task list */}
       {completedTasks.length === 0 ? (
         <motion.div variants={item} className="text-center py-16">
-          <CheckCircle2 className="w-12 h-12 mx-auto text-surface-300 dark:text-surface-600 mb-3" />
-          <p className="text-surface-500 dark:text-surface-500 font-medium">No completed tasks yet</p>
-          <p className="text-sm text-surface-400 dark:text-surface-600 mt-1">
+          <CheckCircle2 className="w-12 h-12 mx-auto text-[var(--text-muted)] mb-3 opacity-30" />
+          <p className="text-[var(--text-secondary)] font-medium">No completed tasks yet</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">
             Tasks you complete will show up here
           </p>
         </motion.div>
@@ -100,24 +100,24 @@ export default function Completed() {
                 >
                   <div className="flex items-center gap-3">
                     {/* Check icon */}
-                    <div className="w-5 h-5 rounded-full bg-primary-600 flex items-center justify-center flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-[var(--accent)] flex items-center justify-center flex-shrink-0">
                       <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-surface-400 dark:text-surface-500 line-through truncate">
+                      <h3 className="text-sm font-medium text-[var(--text-secondary)] line-through truncate">
                         {task.title}
                       </h3>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
-                        <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${priority.bg} ${priority.color} opacity-60`}>
+                        <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${priority.color} opacity-60`} style={{ background: `color-mix(in srgb, currentColor 10%, transparent)` }}>
                           {priority.label}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${category.color} opacity-60`}>
+                        <span className={`px-2 py-0.5 rounded-md text-xs font-medium`} style={{ background: `color-mix(in srgb, ${category.color.split(' ')[1].replace('text-', '')} 10%, transparent)`, color: `var(--text-primary)`, opacity: 0.6 }}>
                           {category.label}
                         </span>
                         {task.completedAt && (
-                          <span className="text-xs text-surface-400">
+                          <span className="text-xs text-[var(--text-muted)]">
                             Completed {formatDate(task.completedAt)}
                           </span>
                         )}
@@ -125,20 +125,20 @@ export default function Completed() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    <div className="flex items-center gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity flex-shrink-0">
                       <button
                         onClick={() => toggleComplete(task.id)}
-                        className="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-dark-hover text-surface-400 hover:text-primary-600 transition-colors"
+                        className="p-1.5 min-w-[44px] min-h-[44px] lg:min-w-0 lg:min-h-0 flex items-center justify-center rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
                         title="Restore"
                       >
-                        <RotateCcw className="w-3.5 h-3.5" />
+                        <RotateCcw className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
                       </button>
                       <button
                         onClick={() => deleteTask(task.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-surface-400 hover:text-red-500 transition-colors"
+                        className="p-1.5 min-w-[44px] min-h-[44px] lg:min-w-0 lg:min-h-0 flex items-center justify-center rounded-lg hover:bg-red-500/10 text-[var(--text-muted)] hover:text-red-500 transition-colors"
                         title="Delete"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
                       </button>
                     </div>
                   </div>

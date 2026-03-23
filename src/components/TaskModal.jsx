@@ -36,6 +36,8 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
         category: editTask.category || 'work',
         dueDate: editTask.dueDate || '',
         dueTime: editTask.dueTime || '',
+        timeBlockStart: editTask.timeBlockStart,
+        timeBlockEnd: editTask.timeBlockEnd,
       });
     } else {
       setForm(defaultForm);
@@ -68,23 +70,23 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
           />
           <motion.div
             {...modal}
-            className="relative w-full max-w-md bg-white dark:bg-dark-card rounded-2xl shadow-2xl border border-surface-200 dark:border-dark-border overflow-hidden"
+            className="relative w-full max-w-md bg-[var(--bg-card)] rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100 dark:border-dark-border">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]">
               <div className="flex items-center gap-2">
                 {editTask ? (
-                  <Pencil className="w-4 h-4 text-primary-600" />
+                  <Pencil className="w-4 h-4 text-[var(--accent)]" />
                 ) : (
-                  <Plus className="w-4 h-4 text-primary-600" />
+                  <Plus className="w-4 h-4 text-[var(--accent)]" />
                 )}
-                <h2 className="text-base font-bold text-surface-900 dark:text-white">
+                <h2 className="text-base font-bold text-[var(--text-primary)]">
                   {editTask ? 'Edit Task' : 'New Task'}
                 </h2>
               </div>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-lg hover:bg-surface-100 dark:hover:bg-dark-hover text-surface-400 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-muted)] transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -94,7 +96,7 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                   Task Title *
                 </label>
                 <input
@@ -110,7 +112,7 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
 
               {/* Description */}
               <div>
-                <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                   Description
                 </label>
                 <textarea
@@ -125,7 +127,7 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
               {/* Priority & Category row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1.5">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                     Priority
                   </label>
                   <select
@@ -139,7 +141,7 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1.5">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                     Category
                   </label>
                   <select
@@ -157,7 +159,7 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
               {/* Date & Time row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1.5">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                     Due Date
                   </label>
                   <input
@@ -168,7 +170,7 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-surface-600 dark:text-surface-400 mb-1.5">
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
                     Due Time
                   </label>
                   <input
@@ -176,6 +178,8 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
                     value={form.dueTime}
                     onChange={handleChange('dueTime')}
                     className="input-field"
+                    disabled={form.timeBlockStart !== undefined && form.timeBlockStart !== null}
+                    title={form.timeBlockStart !== undefined && form.timeBlockStart !== null ? "Time is controlled by the Calendar blocks" : ""}
                   />
                 </div>
               </div>

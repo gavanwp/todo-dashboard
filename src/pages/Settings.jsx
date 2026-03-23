@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings as SettingsIcon, Moon, Sun, Trash2, AlertTriangle, Palette } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { Settings as SettingsIcon, Trash2, AlertTriangle, Palette, Check } from 'lucide-react';
+import { useTheme, THEMES } from '../context/ThemeContext';
 import { useTasks } from '../context/TaskContext';
+import { useOffline } from '../context/OfflineContext';
 import { CATEGORIES } from '../utils';
 
 const container = {
@@ -16,8 +17,9 @@ const item = {
 };
 
 export default function Settings() {
-  const { isDark, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { tasks, clearAll } = useTasks();
+  const { isOnline, syncStatus, lastSyncTime, syncNow, pendingCount } = useOffline();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleClearAll = () => {
@@ -34,47 +36,116 @@ export default function Settings() {
             <SettingsIcon className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
               Settings
             </h1>
-            <p className="text-sm text-surface-500">Customize your experience</p>
+            <p className="text-sm text-[var(--text-muted)]">Customize your experience</p>
           </div>
         </div>
       </motion.div>
 
-      {/* Appearance */}
+      {/* Theme Picker */}
       <motion.div variants={item} className="glass-card p-5">
         <div className="flex items-center gap-2 mb-4">
-          <Palette className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-          <h2 className="text-sm font-bold text-surface-900 dark:text-white">Appearance</h2>
+          <Palette className="w-4 h-4 text-[var(--accent)]" />
+          <h2 className="text-sm font-bold text-[var(--text-primary)]">Theme</h2>
         </div>
 
-        <div className="flex items-center justify-between py-3 border-b border-surface-100 dark:border-dark-border">
-          <div className="flex items-center gap-3">
-            {isDark ? <Moon className="w-4 h-4 text-surface-500" /> : <Sun className="w-4 h-4 text-surface-500" />}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {THEMES.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTheme(t.id)}
+              className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left group ${
+                theme === t.id
+                  ? 'border-[var(--accent)] shadow-lg'
+                  : 'border-[var(--border-color)] hover:border-[var(--text-muted)]'
+              }`}
+              style={{
+                background: t.preview[0],
+              }}
+            >
+              {/* Selected check */}
+              {theme === t.id && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                  style={{ background: 'var(--accent)' }}
+                >
+                  <Check className="w-3 h-3 text-white" />
+                </motion.div>
+              )}
+
+              {/* Color preview dots */}
+              <div className="flex gap-1.5 mb-3">
+                {t.preview.map((color, i) => (
+                  <div
+                    key={i}
+                    className="w-4 h-4 rounded-full border border-white/10"
+                    style={{ background: color }}
+                  />
+                ))}
+              </div>
+
+              <p className="text-sm font-bold" style={{ color: t.preview[3] || '#fff' }}>
+                {t.label}
+              </p>
+              <p className="text-[10px] mt-0.5 opacity-60" style={{ color: t.preview[3] || '#aaa' }}>
+                {t.description}
+              </p>
+            </button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Sync Settings */}
+      <motion.div variants={item} className="glass-card p-5">
+        <h2 className="text-sm font-bold text-[var(--text-primary)] mb-4">Sync & Offline</h2>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid var(--border-color)' }}>
             <div>
-              <p className="text-sm font-medium text-surface-900 dark:text-white">Dark Mode</p>
-              <p className="text-xs text-surface-500">Switch between light and dark theme</p>
+              <p className="text-sm font-medium text-[var(--text-primary)]">Connection Status</p>
+              <p className="text-xs text-[var(--text-muted)]">
+                {isOnline ? 'Connected to the internet' : 'Working offline'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`sync-dot ${isOnline ? 'online' : 'offline'}`} />
+              <span className="text-xs font-medium text-[var(--text-secondary)]">
+                {isOnline ? 'Online' : 'Offline'}
+              </span>
             </div>
           </div>
-          <button
-            onClick={toggleTheme}
-            className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-              isDark ? 'bg-primary-600' : 'bg-surface-300'
-            }`}
-          >
-            <motion.div
-              layout
-              className="absolute top-[3px] w-[18px] h-[18px] bg-white rounded-full shadow-sm"
-              style={{ left: isDark ? 'calc(100% - 21px)' : '3px' }}
-            />
-          </button>
+
+          <div className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid var(--border-color)' }}>
+            <div>
+              <p className="text-sm font-medium text-[var(--text-primary)]">Pending Changes</p>
+              <p className="text-xs text-[var(--text-muted)]">
+                {pendingCount > 0 ? `${pendingCount} changes waiting to sync` : 'All changes synced'}
+              </p>
+            </div>
+            <button
+              onClick={syncNow}
+              disabled={!isOnline || pendingCount === 0}
+              className="btn-secondary text-xs px-3 py-1.5 disabled:opacity-40"
+            >
+              Sync Now
+            </button>
+          </div>
+
+          {lastSyncTime && (
+            <p className="text-xs text-[var(--text-muted)]">
+              Last synced: {new Date(lastSyncTime).toLocaleString()}
+            </p>
+          )}
         </div>
       </motion.div>
 
       {/* Categories */}
       <motion.div variants={item} className="glass-card p-5">
-        <h2 className="text-sm font-bold text-surface-900 dark:text-white mb-4">Categories</h2>
+        <h2 className="text-sm font-bold text-[var(--text-primary)] mb-4">Categories</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {CATEGORIES.map(cat => (
             <div
@@ -89,12 +160,15 @@ export default function Settings() {
 
       {/* Data */}
       <motion.div variants={item} className="glass-card p-5">
-        <h2 className="text-sm font-bold text-surface-900 dark:text-white mb-4">Data Management</h2>
+        <h2 className="text-sm font-bold text-[var(--text-primary)] mb-4">Data Management</h2>
 
-        <div className="flex items-center justify-between py-3 border-b border-surface-100 dark:border-dark-border">
+        <div
+          className="flex items-center justify-between py-3"
+          style={{ borderBottom: '1px solid var(--border-color)' }}
+        >
           <div>
-            <p className="text-sm font-medium text-surface-900 dark:text-white">Total Tasks</p>
-            <p className="text-xs text-surface-500">{tasks.length} tasks stored in local storage</p>
+            <p className="text-sm font-medium text-[var(--text-primary)]">Total Tasks</p>
+            <p className="text-xs text-[var(--text-muted)]">{tasks.length} tasks stored locally</p>
           </div>
         </div>
 
@@ -108,13 +182,13 @@ export default function Settings() {
               Clear All Data
             </button>
           ) : (
-            <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+            <div className="flex items-center gap-3 p-3 bg-red-500/10 rounded-xl border border-red-500/20">
               <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-red-700 dark:text-red-400">
+                <p className="text-sm font-medium text-red-500">
                   Delete all {tasks.length} tasks?
                 </p>
-                <p className="text-xs text-red-500 dark:text-red-400/70">This cannot be undone.</p>
+                <p className="text-xs text-red-500/70">This cannot be undone.</p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 <button
@@ -137,12 +211,15 @@ export default function Settings() {
 
       {/* About */}
       <motion.div variants={item} className="glass-card p-5">
-        <h2 className="text-sm font-bold text-surface-900 dark:text-white mb-2">About TaskFlow</h2>
-        <p className="text-xs text-surface-500 leading-relaxed">
-          TaskFlow is a modern productivity dashboard for daily task management. 
-          Built with React, Tailwind CSS, and Framer Motion. All data is stored locally in your browser.
+        <h2 className="text-sm font-bold text-[var(--text-primary)] mb-2">About TaskFlow</h2>
+        <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+          TaskFlow is a modern productivity dashboard with themes, calendar, time blocking, and offline support.
+          Built with React, Tailwind CSS, and Framer Motion.
         </p>
-        <p className="text-xs text-surface-400 mt-2">Version 1.0.0</p>
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-xs text-[var(--text-muted)] opacity-60">Version 2.0.0</p>
+          <p className="text-xs font-semibold text-[var(--accent)]">Powered by: Gavan Kumar</p>
+        </div>
       </motion.div>
     </motion.div>
   );

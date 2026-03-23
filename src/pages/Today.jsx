@@ -86,10 +86,10 @@ export default function Today() {
             <Sunrise className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
               Today
             </h1>
-            <p className="text-sm text-surface-500">
+            <p className="text-sm text-[var(--text-muted)]">
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
             </p>
           </div>
@@ -99,15 +99,16 @@ export default function Today() {
           className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Add Task
+          <span className="hidden sm:inline">Add Task</span>
+          <span className="sm:hidden">Add</span>
         </button>
       </motion.div>
 
       {/* Progress */}
       <motion.div variants={item} className="glass-card p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-surface-600 dark:text-surface-400">Today's Progress</span>
-          <span className="text-xs font-bold text-primary-600 dark:text-primary-400">
+          <span className="text-xs font-semibold text-[var(--text-secondary)]">Today's Progress</span>
+          <span className="text-xs font-bold text-[var(--accent)]">
             {completedCount}/{todayTasks.length}
           </span>
         </div>
@@ -128,9 +129,9 @@ export default function Today() {
       <motion.div variants={item}>
         {todayTasks.length === 0 ? (
           <div className="text-center py-16">
-            <Sun className="w-12 h-12 mx-auto text-surface-300 dark:text-surface-600 mb-3" />
-            <p className="text-surface-500 dark:text-surface-500 font-medium">No tasks for today</p>
-            <p className="text-sm text-surface-400 dark:text-surface-600 mt-1">
+            <Sun className="w-12 h-12 mx-auto text-[var(--text-muted)] opacity-50 mb-3" />
+            <p className="text-[var(--text-secondary)] font-medium">No tasks for today</p>
+            <p className="text-sm text-[var(--text-muted)] mt-1">
               Add a task or set a due date to today
             </p>
           </div>

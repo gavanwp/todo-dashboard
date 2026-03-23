@@ -62,7 +62,7 @@ export default function Upcoming() {
   }, [tasks]);
 
   // Tasks without dates
-  const undatedTasks = tasks.filter(t => !t.completed && !t.dueDate);
+  const undatedTasks = tasks.filter(t => !t.completed && !t.dueDate && !t.timeBlockStart);
   const totalUpcoming = groupedTasks.reduce((sum, g) => sum + g.tasks.length, 0);
 
   const handleSave = (formData) => {
@@ -88,10 +88,10 @@ export default function Upcoming() {
             <CalendarDays className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
               Upcoming
             </h1>
-            <p className="text-sm text-surface-500">
+            <p className="text-sm text-[var(--text-muted)]">
               {totalUpcoming} tasks ahead
             </p>
           </div>
@@ -101,16 +101,17 @@ export default function Upcoming() {
           className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Add Task
+          <span className="hidden sm:inline">Add Task</span>
+          <span className="sm:hidden">Add</span>
         </button>
       </motion.div>
 
       {/* Grouped tasks */}
       {groupedTasks.length === 0 && undatedTasks.length === 0 ? (
         <motion.div variants={item} className="text-center py-16">
-          <CalendarDays className="w-12 h-12 mx-auto text-surface-300 dark:text-surface-600 mb-3" />
-          <p className="text-surface-500 dark:text-surface-500 font-medium">No upcoming tasks</p>
-          <p className="text-sm text-surface-400 dark:text-surface-600 mt-1">
+          <CalendarDays className="w-12 h-12 mx-auto text-[var(--text-muted)] mb-3 opacity-50" />
+          <p className="text-[var(--text-secondary)] font-medium">No upcoming tasks</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">
             Tasks with future due dates will appear here
           </p>
         </motion.div>
@@ -119,11 +120,11 @@ export default function Upcoming() {
           {groupedTasks.map((group) => (
             <motion.div key={group.dateStr} variants={item} className="space-y-2">
               <div className="flex items-center gap-2 px-1">
-                <ChevronRight className="w-3.5 h-3.5 text-primary-500" />
-                <h2 className="text-sm font-bold text-surface-900 dark:text-white">
+                <ChevronRight className="w-3.5 h-3.5 text-[var(--accent)]" />
+                <h2 className="text-sm font-bold text-[var(--text-primary)]">
                   {group.label}
                 </h2>
-                <span className="text-xs font-medium text-surface-400 bg-surface-100 dark:bg-dark-hover px-2 py-0.5 rounded-full">
+                <span className="text-xs font-medium text-[var(--text-muted)] bg-[var(--bg-hover)] px-2 py-0.5 rounded-full">
                   {group.tasks.length}
                 </span>
               </div>
@@ -145,12 +146,12 @@ export default function Upcoming() {
 
           {undatedTasks.length > 0 && (
             <motion.div variants={item} className="space-y-2">
-              <div className="flex items-center gap-2 px-1">
-                <ChevronRight className="w-3.5 h-3.5 text-surface-400" />
-                <h2 className="text-sm font-bold text-surface-600 dark:text-surface-400">
+              <div className="flex items-center gap-2 px-1 mt-4">
+                <ChevronRight className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                <h2 className="text-sm font-bold text-[var(--text-secondary)]">
                   No Due Date
                 </h2>
-                <span className="text-xs font-medium text-surface-400 bg-surface-100 dark:bg-dark-hover px-2 py-0.5 rounded-full">
+                <span className="text-xs font-medium text-[var(--text-muted)] bg-[var(--bg-hover)] px-2 py-0.5 rounded-full">
                   {undatedTasks.length}
                 </span>
               </div>

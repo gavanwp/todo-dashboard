@@ -10,7 +10,7 @@ export default function SearchFilter({ searchQuery, onSearchChange, filters, onF
       <div className="flex items-center gap-2">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-surface-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
           <input
             type="text"
             value={searchQuery}
@@ -21,7 +21,7 @@ export default function SearchFilter({ searchQuery, onSearchChange, filters, onF
           {searchQuery && (
             <button
               onClick={() => onSearchChange('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -31,8 +31,8 @@ export default function SearchFilter({ searchQuery, onSearchChange, filters, onF
         {/* Filter toggle */}
         <button
           onClick={() => setShowFilters(!showFilters)}
-          className={`btn-secondary flex items-center gap-2 ${
-            showFilters ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400' : ''
+          className={`btn-secondary flex items-center gap-2 min-h-[44px] ${
+            showFilters ? '!bg-[var(--accent-glow)] !text-[var(--accent)]' : ''
           }`}
         >
           <SlidersHorizontal className="w-4 h-4" />
@@ -46,7 +46,7 @@ export default function SearchFilter({ searchQuery, onSearchChange, filters, onF
           <select
             value={filters.priority}
             onChange={(e) => onFilterChange('priority', e.target.value)}
-            className="input-field w-auto text-xs"
+            className="input-field w-auto text-xs py-1.5 px-3"
           >
             <option value="">All Priorities</option>
             <option value="high">🔴 High</option>
@@ -57,7 +57,7 @@ export default function SearchFilter({ searchQuery, onSearchChange, filters, onF
           <select
             value={filters.category}
             onChange={(e) => onFilterChange('category', e.target.value)}
-            className="input-field w-auto text-xs"
+            className="input-field w-auto text-xs py-1.5 px-3"
           >
             <option value="">All Categories</option>
             {CATEGORIES.map(c => (
@@ -68,7 +68,7 @@ export default function SearchFilter({ searchQuery, onSearchChange, filters, onF
           <select
             value={filters.status}
             onChange={(e) => onFilterChange('status', e.target.value)}
-            className="input-field w-auto text-xs"
+            className="input-field w-auto text-xs py-1.5 px-3"
           >
             <option value="">All Status</option>
             <option value="active">Active</option>
@@ -82,7 +82,7 @@ export default function SearchFilter({ searchQuery, onSearchChange, filters, onF
                 onFilterChange('category', '');
                 onFilterChange('status', '');
               }}
-              className="text-xs text-primary-600 hover:text-primary-700 font-medium px-2"
+              className="text-xs text-[var(--accent)] hover:underline font-medium px-2 min-h-[36px]"
             >
               Clear all
             </button>
