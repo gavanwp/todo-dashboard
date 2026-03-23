@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
-import { Check, Clock, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { Check, Clock, Pencil, Trash2, GripVertical, Target, MapPin, Repeat, AlertCircle } from 'lucide-react';
 import { formatDate, formatTime, PRIORITIES, getCategoryConfig } from '../utils';
+import { useGoals } from '../context/GoalContext';
 
 export default function TaskCard({ task, onToggle, onEdit, onDelete, isDragging, dragHandleProps }) {
+  const { goals } = useGoals();
   const priority = PRIORITIES[task.priority] || PRIORITIES.low;
   const category = getCategoryConfig(task.category);
 
@@ -105,6 +107,34 @@ export default function TaskCard({ task, onToggle, onEdit, onDelete, isDragging,
                 <Clock className="w-3 h-3" />
                 {formatDate(task.dueDate)}
                 {task.dueTime && ` ${formatTime(task.dueTime)}`}
+              </span>
+            )}
+
+            {/* Smart Reminders Badges */}
+            {task.goalId && goals && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-blue-500/10 text-blue-500">
+                <Target className="w-3 h-3" />
+                {goals.find(g => g.id === task.goalId)?.title || 'Goal'}
+              </span>
+            )}
+            
+            {task.location && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-indigo-500/10 text-indigo-500" title={task.location}>
+                <MapPin className="w-3 h-3" />
+                <span className="max-w-[80px] truncate">{task.location}</span>
+              </span>
+            )}
+
+            {task.recurringRule && task.recurringRule !== 'none' && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-purple-500/10 text-purple-500 capitalize">
+                <Repeat className="w-3 h-3" />
+                {task.recurringRule}
+              </span>
+            )}
+
+            {task.escalation && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-red-500/10 text-red-500" title="Escalation active">
+                <AlertCircle className="w-3 h-3" />
               </span>
             )}
           </div>

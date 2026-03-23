@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Pencil } from 'lucide-react';
 import { CATEGORIES } from '../utils';
+import { useGoals } from '../context/GoalContext';
 
 const overlay = {
   initial: { opacity: 0 },
@@ -22,9 +23,14 @@ const defaultForm = {
   category: 'work',
   dueDate: '',
   dueTime: '',
+  goalId: '',
+  location: '',
+  recurringRule: 'none',
+  escalation: false,
 };
 
 export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
+  const { goals } = useGoals();
   const [form, setForm] = useState(defaultForm);
 
   useEffect(() => {
@@ -38,6 +44,10 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
         dueTime: editTask.dueTime || '',
         timeBlockStart: editTask.timeBlockStart,
         timeBlockEnd: editTask.timeBlockEnd,
+        goalId: editTask.goalId || '',
+        location: editTask.location || '',
+        recurringRule: editTask.recurringRule || 'none',
+        escalation: editTask.escalation || false,
       });
     } else {
       setForm(defaultForm);
@@ -181,6 +191,78 @@ export default function TaskModal({ isOpen, onClose, onSave, editTask }) {
                     disabled={form.timeBlockStart !== undefined && form.timeBlockStart !== null}
                     title={form.timeBlockStart !== undefined && form.timeBlockStart !== null ? "Time is controlled by the Calendar blocks" : ""}
                   />
+                </div>
+              </div>
+
+              {/* Goal Link */}
+              {goals && goals.length > 0 && (
+                <div>
+                  <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
+                    Link to Goal
+                  </label>
+                  <select
+                    value={form.goalId}
+                    onChange={handleChange('goalId')}
+                    className="input-field"
+                  >
+                    <option value="">None</option>
+                    {goals.map(g => (
+                      <option key={g.id} value={g.id}>{g.title}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Smart Reminders */}
+              <div className="bg-[var(--bg-hover)] p-3 rounded-xl border border-[var(--border-color)]">
+                <h3 className="text-xs font-bold text-[var(--text-primary)] mb-3 flex items-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full bg-[var(--accent)] text-white flex items-center justify-center text-[10px]">!</span>
+                  Smart Reminders
+                </h3>
+                
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[var(--text-secondary)] mb-1">
+                        Location (Future)
+                      </label>
+                      <input
+                        type="text"
+                        value={form.location}
+                        onChange={handleChange('location')}
+                        placeholder="e.g. 'At Supermarket'"
+                        className="input-field text-sm py-1.5 px-2.5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[var(--text-secondary)] mb-1">
+                        Repeating Task
+                      </label>
+                      <select
+                        value={form.recurringRule}
+                        onChange={handleChange('recurringRule')}
+                        className="input-field text-sm py-1.5 px-2.5"
+                      >
+                        <option value="none">Does not repeat</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly-monday">Every Monday</option>
+                        <option value="monthly">Monthly</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.escalation}
+                      onChange={e => setForm(prev => ({ ...prev, escalation: e.target.checked }))}
+                      className="w-4 h-4 rounded text-[var(--accent)] bg-[var(--bg-card)] border-[var(--border-color)] focus:ring-[var(--accent)] focus:ring-offset-0"
+                    />
+                    <div>
+                      <span className="text-xs font-medium text-[var(--text-primary)] block">Escalation Reminders</span>
+                      <span className="text-[10px] text-[var(--text-muted)] block">Notify again if ignored</span>
+                    </div>
+                  </label>
                 </div>
               </div>
 

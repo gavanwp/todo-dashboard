@@ -11,6 +11,7 @@ import {
   ListTodo,
   User,
   Flame,
+  Target,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useProfile } from '../context/ProfileContext';
@@ -19,6 +20,8 @@ import SyncStatus from './SyncStatus';
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/today', icon: SunIcon, label: 'Today' },
+  { to: '/habits', icon: Flame, label: 'Habits' },
+  { to: '/goals', icon: Target, label: 'Goals' },
   { to: '/calendar', icon: Calendar, label: 'Calendar' },
   { to: '/upcoming', icon: CalendarDays, label: 'Upcoming' },
   { to: '/completed', icon: CheckCircle2, label: 'Completed' },
