@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #ced4da;
+    border-radius: 3px;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #3a3d4a;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #4a4d5a;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-surface-200 rounded-2xl shadow-card;
+  }
+  
+  .dark .glass-card {
+    @apply bg-dark-card/80 border-dark-border shadow-card-dark;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-surface-600 font-medium text-sm transition-all duration-200 hover:bg-primary-50 hover:text-primary-600;
+  }
+
+  .dark .sidebar-link {
+    @apply text-surface-400 hover:bg-dark-hover hover:text-primary-400;
+  }
+
+  .sidebar-link.active {
+    @apply bg-primary-50 text-primary-600 shadow-sm;
+  }
+
+  .dark .sidebar-link.active {
+    @apply bg-primary-900/20 text-primary-400;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-100 text-surface-700 px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 hover:bg-surface-200 active:scale-[0.98];
+  }
+
+  .dark .btn-secondary {
+    @apply bg-dark-hover text-surface-300 hover:bg-dark-border;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-xl border border-surface-200 bg-white text-surface-900 text-sm font-medium placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-400 transition-all duration-200;
+  }
+
+  .dark .input-field {
+    @apply bg-dark-hover border-dark-border text-surface-200 placeholder:text-surface-600 focus:ring-primary-600/30 focus:border-primary-600;
+  }
+}
