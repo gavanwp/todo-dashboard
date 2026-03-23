@@ -7,6 +7,7 @@ import Today from './pages/Today';
 import Upcoming from './pages/Upcoming';
 import Completed from './pages/Completed';
 import Settings from './pages/Settings';
+import InstallPrompt from './components/InstallPrompt';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             </Route>
           </Routes>
         </BrowserRouter>
+        <InstallPrompt />
       </TaskProvider>
     </ThemeProvider>
   );
